@@ -1,0 +1,9 @@
+SOPHIE_archive:
+  #url: http://atlas.obs-hp.fr/sophie/
+  51_peg:
+    url: http://atlas.obs-hp.fr/sophie/sophie.cgi?n=sophies&a=htab&ob=ra,seq&c=o&o=51%20peg
+    table_body:
+      header: table[class="datatable"] thead tr th a
+      rows: table[class="datatable"] tbody tr
+      #date: table[class="datatable"] tbody tr td
+
