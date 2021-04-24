@@ -5,5 +5,5 @@ SOPHIE_archive:
     table_body:
       header: table[class="datatable"] thead tr th a
       rows: table[class="datatable"] tbody tr
-      #date: table[class="datatable"] tbody tr td
-
+      view_head: div[class="cizfd"] pre
+      search_ccf: table[class="datatable"] tr
