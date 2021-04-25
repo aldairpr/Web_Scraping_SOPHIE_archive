@@ -10,7 +10,6 @@ from common import config
 class NewsPage:
 
     def __init__(self, news_site_uid, url):
-        # Rama principal con el html
         self._config = config()['SOPHIE_archive'][news_site_uid]
         self._queries = self._config['table_body']
         self._html = None
@@ -18,7 +17,7 @@ class NewsPage:
 
         self._visit(url)
 
-    # hacer select del html de news_site_uid
+    # Make a select of the html chosen in news_site_uid
     def _select(self, query_string):
         return self._html.select(query_string)
 
@@ -76,17 +75,23 @@ class HomePage(NewsPage):
          
         return list(link[0]['href'] for link in link_list), none_url_list
 
-    @property
-    def search_ccf_links(self):
-        return self._obtein_link('search_ccf')
+    def get_links(self, column_name):
+        return self._obtein_link(column_name)
 
-    @property
-    def view_head_links(self):
-        return self._obtein_link('view_head')
-
-    def get_html_data(self, column_name):
+    def get_html_link(self, column_name):
         return self._select(self._queries[column_name])
 
+    def radial_velocity(self):
+        query = self.get_html_link('search_ccf')
+        result = query[7].select('td')[1].text
+        return result if len(query) else ''
+
+    def julian_day(self):
+        query = self.get_html_link('view_head')
+        inicio = query[0].text.find('BJD     24')
+        final = query[0].text.find('Barycentric Julian Day')
+        result = str(query[0].text[inicio:final].replace('BJD','').replace(' ', ''))
+        return result if len(query) else ''
 
 
 class TableBody(NewsPage):
@@ -111,12 +116,6 @@ class TableBody(NewsPage):
         clean_results = np.delete(results, set_url_missing).tolist() 
         return clean_results
     
-    def date(self, set_url_missing):
-        return self._obtein_data('date', set_url_missing)
-    
-    def fiber_b(self, set_url_missing):
-        return self._obtein_data('fiber_b', set_url_missing)
-    
-    def signal_to_noise(self, set_url_missing):
-        return self._obtein_data('sn26', set_url_missing)
+    def get_tablebody_data(self, column_name, set_url_missing):
+        return self._obtein_data(column_name, set_url_missing)
 
