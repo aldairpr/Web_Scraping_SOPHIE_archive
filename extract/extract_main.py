@@ -8,7 +8,7 @@ from requests.exceptions import HTTPError
 from urllib3.exceptions import MaxRetryError
 
 from common import config
-import news_page_objects as news
+import sophie_archive_objects as sophie
 
 import pandas as pd
 import numpy as np
@@ -17,13 +17,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def _main(news_site_uid):
-    host = config()['SOPHIE_archive'][news_site_uid]['url']
+def _main(sophie_site_uid):
+    host = config()['SOPHIE_archive'][sophie_site_uid]['url']
     
     logging.info('Beginning scraper for {}'.format(host))
-    logging.info('The uid select if {}'.format(news_site_uid))
+    logging.info('The uid select if {}'.format(sophie_site_uid))
 
-    homepage = news.HomePage(news_site_uid, host)
+    homepage = sophie.HomePage(sophie_site_uid, host)
 
     search_ccf_links, none_url_search_ccf = homepage.get_links('search_ccf')
     view_head_links, none_url_view_head = homepage.get_links('view_head')
@@ -32,15 +32,15 @@ def _main(news_site_uid):
     set_url_missing = list(set(none_url_search_ccf + none_url_view_head))
 
     # Get data from dates, fibers, signal_to_noise
-    tablebody = news.TableBody(news_site_uid, host)
+    tablebody = sophie.TableBody(sophie_site_uid, host)
 
     dates = tablebody.get_tablebody_data('date', set_url_missing)
     fibers = tablebody.get_tablebody_data('fiber_b', set_url_missing)
     signal_to_noise = tablebody.get_tablebody_data('sn26', set_url_missing)
 
     # Get html from radial_velocity, julian_day
-    html_search_ccf = _get_html(news_site_uid, _build_links(search_ccf_links, 'search_ccf'), 'search_ccf')
-    html_view_head = _get_html(news_site_uid, _build_links(view_head_links, 'view_head'), 'view_head')
+    html_search_ccf = _get_html(sophie_site_uid, _build_links(search_ccf_links, 'search_ccf'), 'search_ccf')
+    html_view_head = _get_html(sophie_site_uid, _build_links(view_head_links, 'view_head'), 'view_head')
 
     # Get data from radial_velocity, julian_day
     radial_velocity = get_data_RV(html_search_ccf, 'search_ccf')
@@ -50,7 +50,7 @@ def _main(news_site_uid):
     all_data = [dates, fibers, signal_to_noise, radial_velocity, julian_day]
     all_header = ['dates', 'fibers', 'signal_to_noise', 'radial_velocity', 'julian_day']
     
-    return _save_articles(news_site_uid, all_data, all_header)
+    return _save_articles(sophie_site_uid, all_data, all_header)
 
 
 def _build_links(links, column_name):
@@ -65,12 +65,12 @@ def _build_links(links, column_name):
     return all_links
 
 
-def _get_html(news_site_uid, links, column_name):
+def _get_html(sophie_site_uid, links, column_name):
     logger.info('Get column data {}'.format(column_name))
 
     articles_data = []
     for link in links:
-        article = _fetch_article(news_site_uid, link, column_name)
+        article = _fetch_article(sophie_site_uid, link, column_name)
 
         if article:
             #logger.info('Article fetched!!')
@@ -78,13 +78,13 @@ def _get_html(news_site_uid, links, column_name):
     
     return articles_data
 
-def _fetch_article(news_site_uid, link, column_name):
+def _fetch_article(sophie_site_uid, link, column_name):
     #logger.info('Star fetching article of {}'.format(column_name))
     #logger.info('link: {}'.format(link))
 
     article = None
     try:
-        article = news.HomePage(news_site_uid, link)
+        article = sophie.HomePage(sophie_site_uid, link)
 
     except (HTTPError, MaxRetryError) as e:
         logger.warning('Error while fechting the article', exc_info=False)
@@ -117,12 +117,12 @@ def get_data_JD(html_view_head, column_name):
     return JD
 
 
-def _save_articles(news_site_uid, all_data, all_header):
-    logger.info('Create dataframe of {}'.format(news_site_uid))
+def _save_articles(sophie_site_uid, all_data, all_header):
+    logger.info('Create dataframe of {}'.format(sophie_site_uid))
     
     now = datetime.datetime.now().strftime('%Y_%m_%d')
-    out_file_name = '{news_site_uid}_{datetime}.csv'.format(
-                    news_site_uid=news_site_uid,
+    out_file_name = '{sophie_site_uid}_{datetime}.csv'.format(
+                    sophie_site_uid=sophie_site_uid,
                     datetime=now)
     
     df = pd.DataFrame(all_data).T
@@ -134,10 +134,10 @@ def _save_articles(news_site_uid, all_data, all_header):
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
 
-    news_site_choices= list( config()['SOPHIE_archive'].keys() )
+    sophie_site_choices= list( config()['SOPHIE_archive'].keys() )
     parser.add_argument('SOPHIE_archive',
                         help='The SOPHIE archive that you want to scrape',
                         type=str,
-                        choices=news_site_choices)
+                        choices=sophie_site_choices)
     args = parser.parse_args()
     _main(args.SOPHIE_archive)

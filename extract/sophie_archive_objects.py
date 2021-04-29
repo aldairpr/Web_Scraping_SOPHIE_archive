@@ -7,17 +7,17 @@ logger = logging.getLogger()
 
 from common import config
 
-class NewsPage:
+class SophiePage:
 
-    def __init__(self, news_site_uid, url):
-        self._config = config()['SOPHIE_archive'][news_site_uid]
+    def __init__(self, sophie_site_uid, url):
+        self._config = config()['SOPHIE_archive'][sophie_site_uid]
         self._queries = self._config['table_body']
         self._html = None
         self._url = url
 
         self._visit(url)
 
-    # Make a select of the html chosen in news_site_uid
+    # Make a select of the html chosen in sophie_site_uid
     def _select(self, query_string):
         return self._html.select(query_string)
 
@@ -49,10 +49,10 @@ class NewsPage:
         return self._select(self._queries['rows'])
 
     
-class HomePage(NewsPage):
+class HomePage(SophiePage):
 
-    def __init__(self, news_site_uid, url):
-        super().__init__(news_site_uid, url)
+    def __init__(self, sophie_site_uid, url):
+        super().__init__(sophie_site_uid, url)
 
     def _obtein_link(self, column_name):
         logger.info('Get links of {}'.format(column_name))
@@ -94,10 +94,10 @@ class HomePage(NewsPage):
         return result if len(query) else ''
 
 
-class TableBody(NewsPage):
+class TableBody(SophiePage):
 
-    def __init__(self, news_site_uid, url):
-        super().__init__(news_site_uid, url)
+    def __init__(self, sophie_site_uid, url):
+        super().__init__(sophie_site_uid, url)
     
     def _obtein_data(self, column_name, set_url_missing):
         logger.info('Get data of {}'.format(column_name))
