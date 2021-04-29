@@ -7,3 +7,10 @@ SOPHIE_archive:
       rows: table[class="datatable"] tbody tr
       view_head: div[class="cizfd"] pre
       search_ccf: table[class="datatable"] tr
+  Vega:
+    url: http://atlas.obs-hp.fr/sophie/sophie.cgi?n=sophies&a=htab&ob=ra,seq&c=o&o=Vega
+    table_body:
+      header: table[class="datatable"] thead tr th a
+      rows: table[class="datatable"] tbody tr
+      view_head: div[class="cizfd"] pre
+      search_ccf: table[class="datatable"] tr

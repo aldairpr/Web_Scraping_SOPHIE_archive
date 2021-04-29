@@ -34,7 +34,8 @@ def _change_data_type(df):
     df['dates'] = df['dates'].astype('datetime64')
     df['fibers'] = df['fibers'].astype('str')
     df['radial_velocity'] = df['radial_velocity'].astype('str')
-    df['JD'] = df['julian_day'].astype('float64')
+    df['julian_day'] = df['julian_day'].astype('float64')
+
     return df
 
 
@@ -43,6 +44,7 @@ def _order_days(df):
     
     df = df.sort_values(by='dates', ascending=True)
     df = df.reset_index(drop=True)
+    
     return df
 
 
@@ -99,7 +101,7 @@ def _filter_data(df):
     # sns > 70
     df = df[df['signal_to_noise'] > 70]
     # err_RV < 0.0009
-    df = df[df['err_RV'] < 0.0009]
+    #df = df[df['err_RV'] < 0.0009]
 
     return df
 
